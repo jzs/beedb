@@ -102,7 +102,13 @@ func (orm *Model) ScanPK(output interface{}) *Model {
 		for i := 0; i < sliceElementType.NumField(); i++ {
 			bb := sliceElementType.Field(i).Tag
 			if bb.Get("beedb") == "PK" || reflect.ValueOf(bb).String() == "PK" {
-				orm.PrimaryKey = sliceElementType.Field(i).Name
+				sqlTag := bb.Get("sql")
+				sqlTags := strings.Split(sqlTag, ",")
+				if len(sqlTags[0]) > 0 {
+					orm.PrimaryKey = sqlTags[0]
+				} else {
+					orm.PrimaryKey = sliceElementType.Field(i).Name
+				}
 			}
 		}
 	} else {
@@ -110,7 +116,14 @@ func (orm *Model) ScanPK(output interface{}) *Model {
 		for i := 0; i < tt.NumField(); i++ {
 			bb := tt.Field(i).Tag
 			if bb.Get("beedb") == "PK" || reflect.ValueOf(bb).String() == "PK" {
-				orm.PrimaryKey = tt.Field(i).Name
+				sqlTag := bb.Get("sql")
+				sqlTags := strings.Split(sqlTag, ",")
+				if len(sqlTags[0]) > 0 {
+					orm.PrimaryKey = sqlTags[0]
+				} else {
+					orm.PrimaryKey = tt.Field(i).Name
+				}
+
 			}
 		}
 	}
