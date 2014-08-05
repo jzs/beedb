@@ -95,6 +95,9 @@ func scanMapElement(fieldv reflect.Value, field reflect.StructField, objMap map[
 	objFieldName := field.Name
 	bb := field.Tag
 	sqlTag := bb.Get("sql")
+	if len(sqlTag) == 0 && strings.Contains(string(bb), "sql") {
+		return errors.New("There seems to be something wrong with the tag spec")
+	}
 
 	if bb.Get("beedb") == "-" || sqlTag == "-" || reflect.ValueOf(bb).String() == "-" {
 		return nil
@@ -104,6 +107,7 @@ func scanMapElement(fieldv reflect.Value, field reflect.StructField, objMap map[
 	if len(sqlTags[0]) > 0 {
 		sqlFieldName = sqlTags[0]
 	}
+
 	inline := false
 	//omitempty := false //TODO!
 	// CHECK INLINE
