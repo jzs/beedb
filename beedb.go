@@ -175,6 +175,7 @@ func (orm *Model) Find(output interface{}) error {
 	if err != nil {
 		return err
 	}
+
 	if len(resultsSlice) == 0 {
 		return errors.New("No record found")
 	} else if len(resultsSlice) == 1 {
@@ -411,7 +412,14 @@ func (orm *Model) Save(output interface{}) error {
 	if reflect.ValueOf(id).Int() == 0 {
 		structPtr := reflect.ValueOf(output)
 		structVal := structPtr.Elem()
-		structField := structVal.FieldByName(orm.PrimaryKey)
+
+		var structField reflect.Value
+		if orm.PrimaryKey == "id" {
+			structField = structVal.FieldByName("Id")
+		} else {
+			structField = structVal.FieldByName(orm.PrimaryKey)
+		}
+
 		id, err := orm.Insert(results)
 		if err != nil {
 			return err
